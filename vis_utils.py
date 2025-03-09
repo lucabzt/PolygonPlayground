@@ -13,6 +13,7 @@ from poly_configs import *
 
 # Set dark background style
 plt.style.use('dark_background')
+plt.ion()
 
 def get_plain(heading: str, size: int=500) -> plt.Figure:
     """
@@ -35,6 +36,28 @@ def get_plain(heading: str, size: int=500) -> plt.Figure:
 
     return fig
 
+def draw_stats(ax, stats):
+    ax.set_title("stats", color='white', pad=15, fontsize=40)
+    ax.axis('off')  # Hide axes
+    # Calculate text positions
+    y_position = 0.8
+    line_height = 0.06
+
+    # Display the statistics
+    for key, value in stats.items():
+        # Format the display text
+        if isinstance(value, float):
+            display_text = f"{key}: {value:.2f}"
+        else:
+            display_text = f"{key}: {value}"
+
+        # Add text
+        ax.text(0.05, y_position, display_text,
+                      fontsize=25, color='white',
+                      transform=ax.transAxes)
+
+        y_position -= line_height
+
 def get_plain_with_stats(stats: Dict, h1: str = "Plot", h2: str = "Statistics", size: int = 500) -> plt.Figure:
     """
     Creates a plt figure with two axis, left are the polygons, right are the statistics like IOU
@@ -46,7 +69,7 @@ def get_plain_with_stats(stats: Dict, h1: str = "Plot", h2: str = "Statistics", 
     """
     # Create figure with custom grid layout - make the statistics panel more narrow
     fig = plt.figure(figsize=(15, 10))
-    gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])  # Changed from [1, 0.8] to [3, 1]
+    gs = gridspec.GridSpec(1, 2, width_ratios=[2, 1])
 
     # Left subplot for polygons (now proportionally larger)
     ax_plain = fig.add_subplot(gs[0])
@@ -58,27 +81,8 @@ def get_plain_with_stats(stats: Dict, h1: str = "Plot", h2: str = "Statistics", 
 
     # Right subplot for statistics (now proportionally narrower)
     ax_stats = fig.add_subplot(gs[1])
-    ax_stats.set_title(h2, color='white', pad=15, fontsize=40)
-    ax_stats.axis('off')  # Hide axes
 
-    # Calculate text positions
-    y_position = 0.8
-    line_height = 0.06
-
-    # Display the statistics
-    for key, value in stats.items():
-        # Format the display text
-        if isinstance(value, float):
-            display_text = f"{key}: {value:.4f}"
-        else:
-            display_text = f"{key}: {value}"
-
-        # Add text
-        ax_stats.text(0.05, y_position, display_text,
-                      fontsize=25, color='white',
-                      transform=ax_stats.transAxes)
-
-        y_position -= line_height
+    draw_stats(ax_stats, stats)
 
     # Add tight layout and spacing between subplots
     fig.tight_layout()
@@ -125,6 +129,22 @@ def vis_poly(poly, p_style=SMALL(), c_style=SMALL_CORNERS()) -> None:
     poly_plot = get_plain("Polygon")
     add_polygon(poly_plot, poly, p_style, c_style)
     plt.show()
+
+def update_plot(fig, polys, stats):
+    plot = fig.axes[0]
+    st = fig.axes[1]
+    patches_to_remove = [p for p in plot.patches]  # or lines, etc.
+    for p in patches_to_remove:
+        p.remove()
+    # Remove any existing scatter points:
+    for coll in plot.collections:
+        coll.remove()
+    for poly in polys:
+        add_polygon(fig, poly)
+    st.clear()
+    draw_stats(st, stats)
+    fig.canvas.draw()
+    fig.canvas.flush_events()
 
 if __name__ == '__main__':
     polygon1 = np.array([

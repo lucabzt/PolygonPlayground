@@ -1,14 +1,15 @@
 """
 Useful helper functions
 """
+import copy
+import csv
+
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from eval_metrics.iou import IoU
 
 from poly_configs import *
 import math
-
 
 def sort_poly(poly) -> torch.Tensor:
     """
@@ -20,6 +21,39 @@ def sort_poly(poly) -> torch.Tensor:
     sorted_points = sorted(poly_np, key=lambda p: np.arctan2((p[1] - centroid[1]), p[0] - centroid[0]))
 
     return torch.tensor(np.array(sorted_points))
+
+def loss_to_metric(loss):
+    """
+    Takes a loss function as input and returns the same loss but with a modified forward function,
+    such that it returns a float instead of a tensor (can be useful for logging)
+    """
+    loss_fn = copy.deepcopy(loss)
+    old_forward = loss_fn.forward
+    def new_forward(a,b):
+        return old_forward(a,b).item()
+    loss_fn.forward = new_forward
+    return loss_fn
+
+
+def csv_to_dict_of_lists(csv_file_path):
+    """
+    Convert csv file to a dict of keys (first line values) and values (list of values)
+    """
+    with open(csv_file_path, "r", newline="") as f:
+        reader = csv.reader(f)
+
+        # Read the header (first line)
+        header = next(reader)
+
+        # Initialize a dictionary with empty lists
+        data = {column_name: [] for column_name in header}
+
+        # Fill the lists for each column
+        for row in reader:
+            for column_name, cell_value in zip(header, row):
+                data[column_name].append(cell_value)
+
+    return data
 
 def rand(size, r1, r2) -> torch.Tensor:
     """
@@ -102,10 +136,12 @@ def get_random_rect(center=None, size=500, aspect_ratio=3, r=30) -> torch.Tensor
 
 if __name__ == '__main__':
     from vis_utils import vis_poly, get_plot
+    from eval_metrics.iou import IoU
+    from eval_metrics.hiou import HIoU
 
     target = get_random_rect(center=[250,250])
-    pred = get_random_poly(center=[250,250], r=(30,30))
-    metric = IoU()
+    pred = get_random_poly(center=[200,200], r=(30,30))
+    metric = HIoU()
     iou = metric(target, pred)
 
     plt.close()
