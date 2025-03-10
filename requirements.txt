@@ -4,3 +4,4 @@ numpy
 shapely
 scipy
 scikit-image
+numba

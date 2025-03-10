@@ -4,9 +4,12 @@ Class for logging different loss functions in csv data
 import csv
 import os
 
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
 
+from eval_metrics.ciou import CIoU
 from eval_metrics.iou import IoU
 from eval_metrics.hiou import HIoU
 from eval_metrics.hausdorff import Hausdorff
@@ -18,6 +21,7 @@ class MetricLogger:
     def __init__(self, optim):
         self.optim = optim
         self.eval_metrics = [loss_to_metric(optim.loss_fn)] + [
+            CIoU(),
             IoU(),
             HIoU(),
             Hausdorff(),
@@ -66,22 +70,24 @@ class MetricLogger:
         # Convert values to floats
         iou_values = list(map(float, metric_dict['IoU']))
         hiou_values = list(map(float, metric_dict['HIoU']))
+        ciou_values = list(map(float, metric_dict['CIoU']))
 
         # Plot the metrics
         plt.figure(figsize=(8, 5))
         plt.plot(iou_values, label='IoU')
         plt.plot(hiou_values, label='HIoU')
+        plt.plot(ciou_values, label='CIoU')
 
         # Set fixed y-axis between 0 and 1 with ticks at 0.25 intervals
-        plt.ylim(0, 1)
-        plt.yticks(np.arange(0, 1.25, 0.25))
+        plt.ylim(-1, 1)
+        plt.yticks(np.arange(-1, 1.25, 0.25))
         plt.xlim(0, self.optim.scheduler.num_epochs + 1)
 
         plt.legend()
         plt.grid(True, linestyle="--", alpha=0.6)  # Add a grid for clarity
         plt.xlabel("Epochs")
         plt.ylabel("Metric Value")
-        plt.title("IoU and HIoU Metrics Over Time")
+        plt.title("IoU Metrics Over Time")
         plt.savefig(f"./results/{self.name}/iou_metrics.png")
 
         plt.show(block=True)

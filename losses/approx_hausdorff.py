@@ -6,6 +6,7 @@ from torch import nn
 import torch
 from torch import cdist
 
+
 class AveragedHausdorffLoss(nn.Module):
     def __init__(self):
         super(AveragedHausdorffLoss, self).__init__()

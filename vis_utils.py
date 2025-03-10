@@ -15,6 +15,7 @@ from poly_configs import *
 plt.style.use('dark_background')
 plt.ion()
 
+
 def get_plain(heading: str, size: int=500) -> plt.Figure:
     """
     :param heading: text written on the matplotlib plain
@@ -35,6 +36,7 @@ def get_plain(heading: str, size: int=500) -> plt.Figure:
     ax.set_ylim(0, size)
 
     return fig
+
 
 def draw_stats(ax, stats):
     ax.set_title("stats", color='white', pad=15, fontsize=40)
@@ -57,6 +59,7 @@ def draw_stats(ax, stats):
                       transform=ax.transAxes)
 
         y_position -= line_height
+
 
 def get_plain_with_stats(stats: Dict, h1: str = "Plot", h2: str = "Statistics", size: int = 500) -> plt.Figure:
     """
@@ -90,6 +93,7 @@ def get_plain_with_stats(stats: Dict, h1: str = "Plot", h2: str = "Statistics", 
 
     return fig
 
+
 def add_polygon(figure: plt.Figure, polygon, pol_style = DEFAULT(), cor_style = CIRCLE_CORNERS()) -> None:
     ax = figure.axes[0]
 
@@ -110,11 +114,12 @@ def add_polygon(figure: plt.Figure, polygon, pol_style = DEFAULT(), cor_style = 
 
     figure.axes[0].add_patch(mlp_polygon)
 
+
 def get_plot(polygons, stats, p_styles=None, c_styles=None) -> plt.Figure:
     plain = get_plain_with_stats(stats)
     for idx, poly in enumerate(polygons):
-        p_style = DEFAULT()
-        c_style = CIRCLE_CORNERS()
+        p_style = DEFAULT() if p_styles is None else p_styles[idx]
+        c_style = CIRCLE_CORNERS() if c_styles is None else c_styles[idx]
         if p_styles:
             p_style = p_styles[idx]
         if c_styles:
@@ -124,13 +129,15 @@ def get_plot(polygons, stats, p_styles=None, c_styles=None) -> plt.Figure:
 
     return plain
 
+
 def vis_poly(poly, p_style=SMALL(), c_style=SMALL_CORNERS()) -> None:
     plt.close()
     poly_plot = get_plain("Polygon")
     add_polygon(poly_plot, poly, p_style, c_style)
     plt.show()
 
-def update_plot(fig, polys, stats):
+
+def update_plot(fig, polys, stats, p_styles=None, c_styles=None):
     plot = fig.axes[0]
     st = fig.axes[1]
     patches_to_remove = [p for p in plot.patches]  # or lines, etc.
@@ -139,12 +146,15 @@ def update_plot(fig, polys, stats):
     # Remove any existing scatter points:
     for coll in plot.collections:
         coll.remove()
-    for poly in polys:
-        add_polygon(fig, poly)
+    for idx, poly in enumerate(polys):
+        p_style = SMALL() if p_styles is None else p_styles[idx]
+        c_style = SMALL_CORNERS() if c_styles is None else c_styles[idx]
+        add_polygon(fig, poly, p_style, c_style)
     st.clear()
     draw_stats(st, stats)
     fig.canvas.draw()
     fig.canvas.flush_events()
+
 
 if __name__ == '__main__':
     polygon1 = np.array([

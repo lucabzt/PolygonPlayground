@@ -2,7 +2,6 @@
 Some styles for visualizing polygons with corner points
 """
 
-
 class StyleDict(dict):
     """A dictionary that can be copied and updated easily."""
 
@@ -91,4 +90,9 @@ DIAMOND_CORNERS = StyleDict(
     zorder=5,
     alpha=1.0
 )
+
+NONE = StyleDict(visible=False)
+
+DEFAULT_POLYS = [DEFAULT(edgecolor='lightgreen'), DEFAULT(edgecolor='darkblue'), SMALL(edgecolor='red', zorder=10)]
+DEFAULT_EDGES = [SMALL_CORNERS(s=40, zorder=11), SMALL_CORNERS(s=40, zorder=11), NONE()]
 

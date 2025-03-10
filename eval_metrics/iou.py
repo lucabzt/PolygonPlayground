@@ -29,7 +29,7 @@ class IoU(nn.Module):
             a_poly = Polygon(a)
             b_poly = Polygon(b)
             polygon_intersection = a_poly.intersection(b_poly).area
-            polygon_union = a_poly.area + b_poly.area - polygon_intersection
+            polygon_union = a_poly.union(b_poly).area
             full_iou += float(polygon_intersection / polygon_union)
 
         return full_iou / pred.shape[0]

@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from poly_configs import *
 import math
 
+
 def sort_poly(poly) -> torch.Tensor:
     """
     :param poly: list/numpy array/tensor
@@ -21,6 +22,7 @@ def sort_poly(poly) -> torch.Tensor:
     sorted_points = sorted(poly_np, key=lambda p: np.arctan2((p[1] - centroid[1]), p[0] - centroid[0]))
 
     return torch.tensor(np.array(sorted_points))
+
 
 def loss_to_metric(loss):
     """
@@ -55,6 +57,7 @@ def csv_to_dict_of_lists(csv_file_path):
 
     return data
 
+
 def rand(size, r1, r2) -> torch.Tensor:
     """
     Create random tensor in specified range
@@ -62,6 +65,7 @@ def rand(size, r1, r2) -> torch.Tensor:
     if r2 < r1:
         r1, r2 = r2, r1
     return (r2-r1) * torch.rand(size) + r1
+
 
 def get_random_poly(n=4, size=500, center=None, r=(20, 40)) -> torch.Tensor:
     """
