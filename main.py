@@ -38,14 +38,14 @@ def run(optim):
     optim.logger.plot()
 
 def main():
-    vis = False
+    vis = True
     epochs = 100
     loss_fn = AveragedHausdorffLoss()
 
     target = get_random_rect(center=[250, 250]).unsqueeze(0)
     pred = get_random_poly(center=[10, 10], r=(5, 5)).unsqueeze(0)
 
-    optim = Optimizer(loss_fn, pred, target, num_epochs=epochs, lr=0.1)
+    optim = Optimizer(loss_fn, pred, target, num_epochs=epochs, lr=0.1, loss_steps = [0.3, 0.39])
     with MetricLogger(optim) as logger:
         optim.logger = logger
         if vis:

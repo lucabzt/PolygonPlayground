@@ -86,7 +86,7 @@ def get_plain_with_stats(stats: Dict, h1: str = "Plot", h2: str = "Statistics", 
 
     # Add tight layout and spacing between subplots
     fig.tight_layout()
-    fig.subplots_adjust(wspace=-0.1)  # Reduced wspace from 0.3 to 0.2 for less spacing
+    fig.subplots_adjust(wspace=0.2)  # Reduced wspace from 0.3 to 0.2 for less spacing
 
     return fig
 

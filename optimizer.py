@@ -8,10 +8,11 @@ from torch import nn
 
 
 class Optimizer:
-    def __init__(self, loss_fn, preds, targets, size = 500, lr=0.1, num_epochs=200, logger=None):
-        self.size = 500
+    def __init__(self, loss_fn, preds, targets, size = 500, lr=0.1, num_epochs=200, logger=None, loss_steps=None):
+        self.loss_steps = [0.8, 0.9] if loss_steps is None else loss_steps
+        self.size = size
         self.loss_fn = loss_fn
-        self.scheduler = Scheduler(lr, num_epochs)
+        self.scheduler = Scheduler(lr, self.loss_steps, num_epochs)
         self.preds = preds
         self.targets = targets
         self.logger = logger
@@ -53,18 +54,20 @@ class Optimizer:
             self.step()
 
 class Scheduler:
-    def __init__(self, lr, num_epochs=200):
+    def __init__(self, lr, loss_steps, num_epochs=200):
         self.init_lr = lr
         self.lr = lr
         self.num_epochs = num_epochs
         self.epoch = 0
+        self.loss_steps = loss_steps
+        assert len(loss_steps) == 2, f"You need to provide more loss steps. {loss_steps}"
 
     def step(self):
         self.epoch += 1
-        if self.epoch > 0.9 * self.num_epochs:
+        if self.epoch > self.loss_steps[1] * self.num_epochs:
             self.lr = self.init_lr * 0.01
             return
-        if self.epoch > 0.8 * self.num_epochs:
+        if self.epoch > self.loss_steps[0] * self.num_epochs:
             self.lr = self.init_lr * 0.1
             return
         return
