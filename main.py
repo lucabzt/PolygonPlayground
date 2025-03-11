@@ -5,8 +5,9 @@ from eval_metrics.ciou import CIoU
 from losses.approx_hausdorff import AveragedHausdorffLoss
 from logger import MetricLogger
 from losses.center_point import CentroidLoss
+from losses.chamfer import ChamferDistance
 from losses.hungarian_l1 import HungarianL1Loss
-from optimal_steps import l1_lrs, centroid_lrs
+from optimal_steps import l1_lrs, centroid_lrs, hausdorff_lrs, chamfer_lrs, hausdorff_01, l1_02
 from util import *
 from optimizer import Optimizer
 from vis_utils import *
@@ -52,14 +53,14 @@ def run(optim, vis_ch):
 
 def main():
     vis = True
-    vis_ch = False
+    vis_ch = True
     epochs = 100
     loss_fn = HungarianL1Loss()
 
     target = get_random_rect(center=[250, 250]).unsqueeze(0)
-    pred = get_random_poly(center=[10, 10], r=(5, 5)).unsqueeze(0)
+    pred = get_random_poly(center=[20, 20], r=(20, 20)).unsqueeze(0)
 
-    optim = Optimizer(loss_fn, pred, target, num_epochs=epochs, lr=0.1, loss_steps=l1_lrs)
+    optim = Optimizer(loss_fn, pred, target, num_epochs=epochs, lr=0.2, loss_steps=l1_02)
     with MetricLogger(optim) as logger:
         optim.logger = logger
         if vis:
